@@ -1,11 +1,10 @@
 {
-  "name": "K-One 商談・用語メモ",
-  "short_name": "K-Oneメモ",
-  "description": "商談メモと専門用語メモをiPhoneで管理するアプリ",
+  "name": "オフィスケイワン営業アプリ",
+  "short_name": "K-One営業",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f5f7fb",
+  "background_color": "#f4f7fb",
   "theme_color": "#0f172a",
   "orientation": "portrait-primary",
   "icons": [
