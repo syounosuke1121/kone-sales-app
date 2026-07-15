@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="K-Oneメモ">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="manifest" href="./manifest.webmanifest">
+<title>K-One 商談・用語メモ</title>
+<style>
+:root{
+  --bg:#f5f7fb;--card:#fff;--ink:#111827;--muted:#6b7280;--line:#e5e7eb;
+  --navy:#0f172a;--blue:#2563eb;--green:#16a34a;--amber:#d97706;--red:#dc2626;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Yu Gothic",sans-serif}
+body{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+header{
+  position:sticky;top:0;z-index:20;background:var(--navy);color:white;
+  padding:calc(14px + env(safe-area-inset-top)) 16px 14px;
+  box-shadow:0 4px 16px rgba(15,23,42,.16)
+}
+header h1{font-size:19px;margin:0}
+header p{font-size:11px;color:#cbd5e1;margin:4px 0 0}
+main{max-width:760px;margin:auto;padding:14px}
+.view{display:none}.view.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;box-shadow:0 3px 12px rgba(15,23,42,.05);margin-bottom:12px}
+h2{font-size:21px;margin:2px 0 14px} h3{font-size:16px;margin:0 0 10px}
+label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
+input,textarea,select{
+  width:100%;font-size:16px;border:1px solid #cbd5e1;border-radius:12px;background:white;
+  padding:12px;min-height:48px;color:var(--ink)
+}
+textarea{min-height:112px;resize:vertical}
+button{font:inherit}
+.primary{width:100%;border:0;border-radius:12px;background:var(--blue);color:white;font-weight:800;padding:13px;margin-top:14px;min-height:50px}
+.secondary{border:1px solid #cbd5e1;background:white;border-radius:10px;padding:9px 11px;font-weight:700}
+.danger{border-color:#fecaca;color:var(--red)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:white;border:1px solid var(--line);border-radius:16px;padding:14px}
+.stat b{font-size:28px;display:block}.stat span{font-size:12px;color:var(--muted)}
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.quick button{min-height:84px;border:0;border-radius:16px;color:white;font-weight:800;font-size:15px}
+.quick .meeting{background:linear-gradient(135deg,#2563eb,#1d4ed8)}
+.quick .term{background:linear-gradient(135deg,#16a34a,#15803d)}
+.search{margin-bottom:12px}
+.item{background:white;border:1px solid var(--line);border-radius:15px;padding:13px;margin-bottom:10px}
+.item-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.item-title{font-weight:800;font-size:16px}
+.meta{font-size:11px;color:var(--muted);margin-top:3px}
+.body{font-size:14px;line-height:1.65;margin-top:10px;white-space:pre-wrap}
+.tag{display:inline-block;font-size:11px;font-weight:700;color:#1d4ed8;background:#eff6ff;padding:4px 8px;border-radius:999px;margin-right:5px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.empty{text-align:center;color:var(--muted);padding:28px 12px}
+.bottom-nav{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;background:white;border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(4,1fr);padding-bottom:env(safe-area-inset-bottom);
+  box-shadow:0 -5px 20px rgba(15,23,42,.08)
+}
+.bottom-nav button{border:0;background:white;padding:8px 2px 9px;font-size:10px;color:var(--muted);font-weight:700}
+.bottom-nav button::before{display:block;font-size:22px;margin-bottom:3px}
+.bottom-nav button[data-view="home"]::before{content:"⌂"}
+.bottom-nav button[data-view="meetings"]::before{content:"商"}
+.bottom-nav button[data-view="terms"]::before{content:"辞"}
+.bottom-nav button[data-view="settings"]::before{content:"⚙"}
+.bottom-nav button.active{color:var(--blue);background:#eff6ff}
+.notice{font-size:12px;line-height:1.6;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:11px}
+.install{position:fixed;left:12px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom));z-index:40;background:#0f172a;color:white;border-radius:15px;padding:12px;display:none;box-shadow:0 15px 30px rgba(0,0,0,.25)}
+.install-row{display:flex;align-items:center;gap:10px}
+.install small{color:#cbd5e1}.install button{margin-left:auto;border:0;border-radius:9px;padding:9px 11px;font-weight:800}
+@media(min-width:700px){.grid{grid-template-columns:repeat(4,1fr)}.quick{max-width:520px}.bottom-nav{left:50%;transform:translateX(-50%);max-width:760px}}
+</style>
+</head>
+<body>
+<header><h1>K-One 商談・用語メモ</h1><p>商談で得た情報と、わからない専門用語をその場で記録</p></header>
+
+<main>
+<section id="home" class="view active">
+  <h2>ホーム</h2>
+  <div class="grid">
+    <div class="stat"><b id="meetingCount">0</b><span>商談メモ</span></div>
+    <div class="stat"><b id="termCount">0</b><span>専門用語</span></div>
+  </div>
+  <div class="card">
+    <h3>すぐにメモ</h3>
+    <div class="quick">
+      <button class="meeting" onclick="openMeetingForm()">商談メモを追加</button>
+      <button class="term" onclick="openTermForm()">専門用語を追加</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>直近の記録</h3>
+    <div id="recentList"></div>
+  </div>
+</section>
+
+<section id="meetings" class="view">
+  <h2>商談メモ</h2>
+  <div class="card" id="meetingFormCard">
+    <h3 id="meetingFormTitle">新しい商談メモ</h3>
+    <input type="hidden" id="meetingId">
+    <label>商談日</label><input type="date" id="meetingDate">
+    <label>会社名・顧客名</label><input id="meetingClient" placeholder="例：〇〇建設コンサルタント">
+    <label>相手の役職・立場</label><input id="meetingRole" placeholder="例：設計部 課長">
+    <label>商談の目的</label><textarea id="meetingPurpose" placeholder="何を確認・提案する商談だったか"></textarea>
+    <label>相手の課題</label><textarea id="meetingProblem" placeholder="困っていること、負担、不満、要望"></textarea>
+    <label>提案・説明した内容</label><textarea id="meetingProposal" placeholder="どの商品・機能・効果を伝えたか"></textarea>
+    <label>次回アクション</label><textarea id="meetingNext" placeholder="資料送付、再訪、確認事項など"></textarea>
+    <label>自分の学び</label><textarea id="meetingLearning" placeholder="次回改善したいこと、気づき"></textarea>
+    <button class="primary" onclick="saveMeeting()">保存する</button>
+    <button class="secondary" style="width:100%;margin-top:8px" onclick="resetMeetingForm()">入力をクリア</button>
+  </div>
+  <input class="search" id="meetingSearch" placeholder="会社名・課題・提案内容で検索" oninput="renderMeetings()">
+  <div id="meetingList"></div>
+</section>
+
+<section id="terms" class="view">
+  <h2>専門用語メモ</h2>
+  <div class="card" id="termFormCard">
+    <h3 id="termFormTitle">わからない用語を記録</h3>
+    <input type="hidden" id="termId">
+    <label>専門用語</label><input id="termName" placeholder="例：照査、点群、橋台">
+    <label>どこで出た言葉か</label><input id="termContext" placeholder="例：〇〇社との商談、製品資料">
+    <label>その場で聞いた説明・自分の予想</label><textarea id="termGuess" placeholder="完全に正しくなくても、まずメモ"></textarea>
+    <label>調べた意味</label><textarea id="termMeaning" placeholder="後から調べて追記"></textarea>
+    <label>営業でどう使うか</label><textarea id="termUsage" placeholder="顧客の課題や提案とどう結びつくか"></textarea>
+    <label>理解度</label>
+    <select id="termLevel">
+      <option value="1">1：まだわからない</option>
+      <option value="2">2：なんとなくわかる</option>
+      <option value="3">3：自分の言葉で説明できる</option>
+      <option value="4">4：商談で使える</option>
+    </select>
+    <button class="primary" onclick="saveTerm()">保存する</button>
+    <button class="secondary" style="width:100%;margin-top:8px" onclick="resetTermForm()">入力をクリア</button>
+  </div>
+  <input class="search" id="termSearch" placeholder="用語・意味・使用場面で検索" oninput="renderTerms()">
+  <div id="termList"></div>
+</section>
+
+<section id="settings" class="view">
+  <h2>設定・バックアップ</h2>
+  <div class="card">
+    <h3>データのバックアップ</h3>
+    <p class="notice">データはこのiPhoneのブラウザ内に保存されます。機種変更やブラウザデータ削除に備えて、定期的にバックアップしてください。</p>
+    <button class="primary" onclick="exportData()">バックアップを書き出す</button>
+    <label>バックアップを読み込む</label>
+    <input type="file" id="importFile" accept="application/json" onchange="importData(event)">
+  </div>
+  <div class="card">
+    <h3>ホーム画面への追加方法</h3>
+    <div class="notice">
+      Safariでこのアプリを開き、画面下の共有ボタンを押します。<br>
+      「ホーム画面に追加」→「追加」を選ぶと、通常のアプリのように起動できます。
+    </div>
+  </div>
+  <div class="card">
+    <h3>すべてのデータを削除</h3>
+    <button class="secondary danger" style="width:100%" onclick="clearAll()">全データを削除する</button>
+  </div>
+</section>
+</main>
+
+<nav class="bottom-nav">
+  <button class="active" data-view="home">ホーム</button>
+  <button data-view="meetings">商談</button>
+  <button data-view="terms">用語</button>
+  <button data-view="settings">設定</button>
+</nav>
+
+<div class="install" id="installBanner">
+  <div class="install-row">
+    <div><b>ホーム画面に追加</b><br><small>アプリとしてすぐ起動できます</small></div>
+    <button id="installBtn">追加</button>
+    <button id="closeInstall">×</button>
+  </div>
+</div>
+
+<script>
+const KEY_MEETINGS="kone_meetings_v1";
+const KEY_TERMS="kone_terms_v1";
+let meetings=JSON.parse(localStorage.getItem(KEY_MEETINGS)||"[]");
+let terms=JSON.parse(localStorage.getItem(KEY_TERMS)||"[]");
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+const today=()=>new Date().toISOString().slice(0,10);
+
+document.querySelectorAll(".bottom-nav button").forEach(b=>b.onclick=()=>showView(b.dataset.view));
+function showView(id){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
+  $(id).classList.add("active");
+  window.scrollTo({top:0,behavior:"smooth"});
+  renderAll();
+}
+function persist(){
+  localStorage.setItem(KEY_MEETINGS,JSON.stringify(meetings));
+  localStorage.setItem(KEY_TERMS,JSON.stringify(terms));
+  renderAll();
+}
+
+function openMeetingForm(){showView("meetings");setTimeout(()=>$("meetingClient").focus(),250)}
+function openTermForm(){showView("terms");setTimeout(()=>$("termName").focus(),250)}
+
+function saveMeeting(){
+  const client=$("meetingClient").value.trim();
+  if(!client){alert("会社名・顧客名を入力してください");return}
+  const obj={
+    id:$("meetingId").value||String(Date.now()),
+    date:$("meetingDate").value||today(),
+    client, role:$("meetingRole").value.trim(),
+    purpose:$("meetingPurpose").value.trim(),
+    problem:$("meetingProblem").value.trim(),
+    proposal:$("meetingProposal").value.trim(),
+    next:$("meetingNext").value.trim(),
+    learning:$("meetingLearning").value.trim(),
+    updatedAt:new Date().toISOString()
+  };
+  const i=meetings.findIndex(x=>x.id===obj.id);
+  if(i>=0) meetings[i]=obj; else meetings.unshift(obj);
+  resetMeetingForm();persist();alert("商談メモを保存しました");
+}
+function editMeeting(id){
+  const m=meetings.find(x=>x.id===id); if(!m)return;
+  showView("meetings");
+  $("meetingId").value=m.id;$("meetingDate").value=m.date;$("meetingClient").value=m.client;
+  $("meetingRole").value=m.role;$("meetingPurpose").value=m.purpose;$("meetingProblem").value=m.problem;
+  $("meetingProposal").value=m.proposal;$("meetingNext").value=m.next;$("meetingLearning").value=m.learning;
+  $("meetingFormTitle").textContent="商談メモを編集";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function deleteMeeting(id){if(confirm("この商談メモを削除しますか？")){meetings=meetings.filter(x=>x.id!==id);persist()}}
+function resetMeetingForm(){
+  ["meetingId","meetingClient","meetingRole","meetingPurpose","meetingProblem","meetingProposal","meetingNext","meetingLearning"].forEach(id=>$(id).value="");
+  $("meetingDate").value=today();$("meetingFormTitle").textContent="新しい商談メモ";
+}
+function renderMeetings(){
+  const q=($("meetingSearch").value||"").toLowerCase();
+  const list=meetings.filter(m=>Object.values(m).join(" ").toLowerCase().includes(q));
+  $("meetingList").innerHTML=list.length?list.map(m=>`
+    <article class="item">
+      <div class="item-head"><div><div class="item-title">${esc(m.client)}</div><div class="meta">${esc(m.date)} ${m.role?"／ "+esc(m.role):""}</div></div><span class="tag">商談</span></div>
+      ${m.problem?`<div class="body"><b>課題</b><br>${esc(m.problem)}</div>`:""}
+      ${m.proposal?`<div class="body"><b>提案</b><br>${esc(m.proposal)}</div>`:""}
+      ${m.next?`<div class="body"><b>次回</b><br>${esc(m.next)}</div>`:""}
+      <div class="actions"><button class="secondary" onclick="editMeeting('${m.id}')">編集</button><button class="secondary danger" onclick="deleteMeeting('${m.id}')">削除</button></div>
+    </article>`).join(""):'<div class="empty">商談メモはまだありません</div>';
+}
+
+function saveTerm(){
+  const name=$("termName").value.trim();
+  if(!name){alert("専門用語を入力してください");return}
+  const obj={
+    id:$("termId").value||String(Date.now()),name,
+    context:$("termContext").value.trim(),guess:$("termGuess").value.trim(),
+    meaning:$("termMeaning").value.trim(),usage:$("termUsage").value.trim(),
+    level:Number($("termLevel").value),updatedAt:new Date().toISOString()
+  };
+  const i=terms.findIndex(x=>x.id===obj.id);
+  if(i>=0) terms[i]=obj; else terms.unshift(obj);
+  resetTermForm();persist();alert("専門用語を保存しました");
+}
+function editTerm(id){
+  const t=terms.find(x=>x.id===id);if(!t)return;
+  showView("terms");
+  $("termId").value=t.id;$("termName").value=t.name;$("termContext").value=t.context;
+  $("termGuess").value=t.guess;$("termMeaning").value=t.meaning;$("termUsage").value=t.usage;$("termLevel").value=t.level;
+  $("termFormTitle").textContent="専門用語を編集";window.scrollTo({top:0,behavior:"smooth"});
+}
+function deleteTerm(id){if(confirm("この専門用語メモを削除しますか？")){terms=terms.filter(x=>x.id!==id);persist()}}
+function resetTermForm(){
+  ["termId","termName","termContext","termGuess","termMeaning","termUsage"].forEach(id=>$(id).value="");
+  $("termLevel").value="1";$("termFormTitle").textContent="わからない用語を記録";
+}
+function renderTerms(){
+  const q=($("termSearch").value||"").toLowerCase();
+  const list=terms.filter(t=>Object.values(t).join(" ").toLowerCase().includes(q));
+  $("termList").innerHTML=list.length?list.map(t=>`
+    <article class="item">
+      <div class="item-head"><div><div class="item-title">${esc(t.name)}</div><div class="meta">${t.context?esc(t.context):"使用場面未登録"}</div></div><span class="tag">理解度 ${t.level}</span></div>
+      ${t.meaning?`<div class="body"><b>意味</b><br>${esc(t.meaning)}</div>`:`<div class="body"><b>未調査</b><br>後から意味を追記してください。</div>`}
+      ${t.usage?`<div class="body"><b>営業での使い方</b><br>${esc(t.usage)}</div>`:""}
+      <div class="actions"><button class="secondary" onclick="editTerm('${t.id}')">編集</button><button class="secondary danger" onclick="deleteTerm('${t.id}')">削除</button></div>
+    </article>`).join(""):'<div class="empty">専門用語メモはまだありません</div>';
+}
+function renderHome(){
+  $("meetingCount").textContent=meetings.length;$("termCount").textContent=terms.length;
+  const recent=[
+    ...meetings.map(x=>({...x,type:"meeting",sort:x.updatedAt})),
+    ...terms.map(x=>({...x,type:"term",sort:x.updatedAt}))
+  ].sort((a,b)=>String(b.sort).localeCompare(String(a.sort))).slice(0,5);
+  $("recentList").innerHTML=recent.length?recent.map(x=>x.type==="meeting"
+    ?`<div class="item" onclick="editMeeting('${x.id}')"><span class="tag">商談</span><b>${esc(x.client)}</b><div class="meta">${esc(x.date)}</div></div>`
+    :`<div class="item" onclick="editTerm('${x.id}')"><span class="tag">用語</span><b>${esc(x.name)}</b><div class="meta">理解度 ${x.level}</div></div>`
+  ).join(""):'<div class="empty">右上ではなく、下のメニューからすぐ記録できます</div>';
+}
+function exportData(){
+  const data={version:1,exportedAt:new Date().toISOString(),meetings,terms};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);const a=document.createElement("a");
+  a.href=url;a.download=`kone-memo-backup-${today()}.json`;a.click();URL.revokeObjectURL(url);
+}
+function importData(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!Array.isArray(d.meetings)||!Array.isArray(d.terms))throw new Error();
+      if(confirm("現在のデータをバックアップ内容で置き換えますか？")){
+        meetings=d.meetings;terms=d.terms;persist();alert("読み込みました");
+      }
+    }catch{alert("正しいバックアップファイルではありません")}
+  };r.readAsText(f);
+}
+function clearAll(){
+  if(confirm("商談メモと専門用語メモをすべて削除します。元に戻せません。")){
+    meetings=[];terms=[];persist();
+  }
+}
+function renderAll(){renderHome();renderMeetings();renderTerms()}
+resetMeetingForm();resetTermForm();renderAll();
+
+let installPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installPrompt=e;$("installBanner").style.display="block"});
+$("installBtn").onclick=async()=>{if(!installPrompt)return;installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;$("installBanner").style.display="none"};
+$("closeInstall").onclick=()=>$("installBanner").style.display="none";
+if("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+</script>
+</body>
+</html>
