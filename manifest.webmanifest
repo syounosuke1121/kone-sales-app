@@ -1,6 +1,7 @@
 {
-  "name": "オフィスケイワン営業アプリ",
-  "short_name": "K-One営業",
+  "name": "K-ONE営業ノート",
+  "short_name": "K-ONE営業",
+  "description": "商談メモ、専門用語、今日の学び、横断検索",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -9,12 +10,12 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "icon-192.PNG",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.PNG",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
